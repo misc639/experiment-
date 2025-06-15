@@ -29,8 +29,9 @@ else:
     if df.empty:
         st.warning("No data loaded for the selected symbol and date range.")
     else:
-        df['EMA_50'] = ta.trend.ema_indicator(df['Close'], window=50)
-        df['EMA_200'] = ta.trend.ema_indicator(df['Close'], window=200)
+     df['EMA_50'] = ta.trend.ema_indicator(df['Close'].values.flatten(), window=50)
+     df['EMA_200'] = ta.trend.ema_indicator(df['Close'].values.flatten(), window=200)
+
 
         fig = go.Figure()
         fig.add_trace(go.Candlestick(
