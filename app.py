@@ -7,7 +7,9 @@ import ta
 @st.cache_data
 def load_data(symbol, start, end, interval):
     df = yf.download(symbol, start=start, end=end, interval=interval)
-    # Fix timezone issue
+    if df.empty:
+        return df
+    # Fix timezone issue: localize only if naive, else convert
     if df.index.tz is None:
         df.index = df.index.tz_localize('UTC').tz_convert('Europe/London')
     else:
@@ -29,9 +31,11 @@ else:
     if df.empty:
         st.warning("No data loaded for the selected symbol and date range.")
     else:
-     df['EMA_50'] = ta.trend.ema_indicator(df['Close'].values.flatten(), window=50)
-     df['EMA_200'] = ta.trend.ema_indicator(df['Close'].values.flatten(), window=200)
+        # Ensure 'Close' column is 1D Series for ta library
+        close_series = df['Close'].squeeze()
 
+        df['EMA_50'] = ta.trend.ema_indicator(close_series, window=50)
+        df['EMA_200'] = ta.trend.ema_indicator(close_series, window=200)
 
         fig = go.Figure()
         fig.add_trace(go.Candlestick(
