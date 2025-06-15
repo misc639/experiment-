@@ -12,7 +12,11 @@ interval = '1h'
 # === Load & Localize Data ===
 df = yf.download(symbol, start=start_date, end=end_date, interval=interval)
 df.dropna(inplace=True)
-df.index = df.index.tz_localize('UTC').tz_convert('Europe/London')
+if df.index.tz is None:
+    df.index = df.index.tz_localize('UTC').tz_convert('Europe/London')
+else:
+    df.index = df.index.tz_convert('Europe/London')
+
 
 # === Indicators ===
 df['EMA_50'] = ta.trend.ema_indicator(df['Close'], window=50)
